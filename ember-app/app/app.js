@@ -9,4 +9,8 @@ export default class App extends Application {
   Resolver = Resolver;
 }
 
+let x = 25;
+
+console.log("hey")
+
 loadInitializers(App, config.modulePrefix);

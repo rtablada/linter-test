@@ -1,0 +1,58 @@
+name: Lint Code Base
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - latest-green-master
+      - v[0-9]*
+
+jobs:
+  run-linters:
+    name: Linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Cache Node Modules
+        uses: actions/cache@v1
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('ember-app/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('ember-app/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-nodemodules-
+      - name: 'Install deps'
+        run: yarn install --frozen-lockfile
+        working-directory: 'ember-app'
+      # - name: Run ESLint
+      #   uses: wearerequired/lint-action@v1
+      #   continue-on-error: true
+      #   with:
+      #     eslint: true
+      #     # eslint_dir: host-web
+      - name: Run Template Lint
+        run: yarn lint:hbs
+        continue-on-error: true
+        working-directory: 'ember-app'
+      - name: Run Template Lint
+        run: yarn lint:js
+        continue-on-error: true
+        working-directory: 'ember-app'
