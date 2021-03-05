@@ -24,7 +24,7 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('ember-app/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Use Node.js
@@ -36,11 +36,12 @@ jobs:
         uses: actions/cache@v1
         with:
           path: node_modules
-          key: ${{ runner.os }}-nodemodules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('ember-app/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-nodemodules-
       - name: 'Install deps'
         run: yarn install --frozen-lockfile
+        working-directory: 'ember-app'
       # - name: Run ESLint
       #   uses: wearerequired/lint-action@v1
       #   continue-on-error: true
